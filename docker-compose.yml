@@ -2,19 +2,19 @@ version: '3.5'
 
 networks:
   default:
-    name: bot-maker
+    name: bot_maker
 
 services:
-  app:
+  app_bot_maker:
     build: .
-    image: bot-maker
+    image: bot_maker
     ports:
       - "9090:9090"
     volumes:
       - .:/app
     depends_on:
       - rabbitmq
-    command: uvicorn app.main:app --host 0.0.0.0 --port 9090 --reload
+    command: uvicorn app.start_bet_maker:app --host 0.0.0.0 --port 9090 --reload
     networks:
       - default
     environment:
@@ -35,10 +35,39 @@ services:
     tty: true
     stdin_open: true
 
+  app_line_provider:
+    build: .
+    image: line_provider
+    ports:
+      - "9091:9091"
+    volumes:
+      - .:/app
+    depends_on:
+      - rabbitmq
+    command: uvicorn app.start_line_provider:app --host 0.0.0.0 --port 9091 --reload
+    networks:
+      - default
+    environment:
+      - DEBUG=True
+      - PROJECT_NAME=BOT_API
+      - ARMQ_URL=amqp://tgk:9Z3JTJzv4ttklypA9g_UJdRT@data.opl.infrapu.sh:5672/tgk
+      - RABBITMQ_HOST=localhost
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_LOGIN=user
+      - RABBITMQ_PASSWORD=user
+      - SERVER_NAME=BOT_API
+      - SERVER_HOST=http://localhost
+      - LOGGER_ROTATION=10 MB
+      - LOGGER_COMPRESSION=zip
+      - LOGGER_DEBUG=True
+      - REDIS_PORT=6378
+      - REDIS_HOST=rq_redis
+    tty: true
+    stdin_open: true
 
   rabbitmq:
     image: rabbitmq:3-management
-    container_name: rabbitmq
+    container_name: rabbitmq_bot_maker
     hostname: 'rabbitmq'
     ports:
       - "5672:5672"
@@ -49,5 +78,22 @@ services:
     volumes:
       - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/mnesia/
       - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+    networks:
+      - default
+  db:
+    container_name: postgresql_db_bot_maker
+    image: postgres:13
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/pgdata
+    # env_file:
+    #   - .env
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=anihortes
+      - POSTGRES_SERVER=postgresql_db
+      - POSTGRES_DB=postgres
+      - PGDATA=/var/lib/postgresql/data/pgdata
     networks:
       - default
