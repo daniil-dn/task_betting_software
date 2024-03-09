@@ -23,7 +23,7 @@ async def create_event(message_in: api_schemas.EventCreateAPI, db: AsyncSession 
     except Exception as err:
         line_provider_api_log.error(err)
         raise HTTPException(status_code=400, detail='Invalid deadline timestamp')
-    event_data = crud_schemas.EventCreate(coefficient=message_in.coefficient, deadline_dt=deadline_dt)
+    event_data = crud_schemas.EventCreate(coefficient=message_in.coefficient, deadline_dt=deadline_dt, status_id=1)
     return await crud_event.create(db, obj_in=event_data)
 
 

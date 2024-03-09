@@ -22,6 +22,7 @@ class EventInDB(EventBase):
 class EventCreate(EventBase):
     coefficient: decimal.Decimal
     deadline_dt: datetime
+    status_id: int
 
 
 class EventUpdate(EventBase):
