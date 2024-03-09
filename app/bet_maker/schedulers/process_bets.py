@@ -31,6 +31,7 @@ async def process_bet(db, bet):
 
 
 async def process_bets():
+    # todo воркер arq
     async with SessionLocal() as db:
         scheduler_log.info('PROCESS BETS')
         bets = await crud_bet.get_all_not_processed(db)
@@ -38,4 +39,4 @@ async def process_bets():
         for bet in bets:
             tasks.append(process_bet(db, bet))
         await asyncio.gather(*tasks)
-        scheduler_log.info('END PROCESS BETS')
+    scheduler_log.info('END PROCESS BETS')
