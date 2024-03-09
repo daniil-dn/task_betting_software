@@ -12,10 +12,10 @@ class EventBase(BaseModel):
 
 class EventInDB(EventBase):
     id: int
-    status_id: int
+    status_id: Optional[int]
     coefficient: decimal.Decimal
     deadline_ts: int
-    updated_at: datetime
+    updated_at: Optional[datetime]
     created_at: datetime
 
 
