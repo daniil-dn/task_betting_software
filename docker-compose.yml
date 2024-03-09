@@ -1,0 +1,53 @@
+version: '3.5'
+
+networks:
+  default:
+    name: bot-maker
+
+services:
+  app:
+    build: .
+    image: bot-maker
+    ports:
+      - "9090:9090"
+    volumes:
+      - .:/app
+    depends_on:
+      - rabbitmq
+    command: uvicorn app.main:app --host 0.0.0.0 --port 9090 --reload
+    networks:
+      - default
+    environment:
+      - DEBUG=True
+      - PROJECT_NAME=BOT_API
+      - ARMQ_URL=amqp://tgk:9Z3JTJzv4ttklypA9g_UJdRT@data.opl.infrapu.sh:5672/tgk
+      - RABBITMQ_HOST=localhost
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_LOGIN=user
+      - RABBITMQ_PASSWORD=user
+      - SERVER_NAME=BOT_API
+      - SERVER_HOST=http://localhost
+      - LOGGER_ROTATION=10 MB
+      - LOGGER_COMPRESSION=zip
+      - LOGGER_DEBUG=True
+      - REDIS_PORT=6378
+      - REDIS_HOST=rq_redis
+    tty: true
+    stdin_open: true
+
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    hostname: 'rabbitmq'
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: "user"
+      RABBITMQ_DEFAULT_PASS: "user"
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/mnesia/
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+    networks:
+      - default
