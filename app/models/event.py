@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 from sqlalchemy import Column, DateTime, BigInteger, ForeignKey, Float
 
@@ -11,5 +11,5 @@ class Event(Base, ModelBase):
     status_id = Column(ForeignKey('event_status.id'), nullable=True)
     coefficient = Column(Float, nullable=False)
     deadline = Column(DateTime(timezone=True))
-    updated_at = Column(DateTime(timezone=True), onupdate=datetime.datetime.utcnow)
-    created_at = Column(DateTime(timezone=True), default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime(timezone=True), onupdate=datetime.utcnow)
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)

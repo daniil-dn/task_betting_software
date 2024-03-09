@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 from sqlalchemy import Column, String, DateTime, BigInteger
 
@@ -9,4 +9,4 @@ from app.models.model_base import ModelBase
 class EventStatus(Base, ModelBase):
     id = Column(BigInteger, primary_key=True, index=True)
     name = Column(String)
-    created_at = Column(DateTime(timezone=True), default=datetime.datetime.utcnow)
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
