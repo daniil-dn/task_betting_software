@@ -10,6 +10,6 @@ class Event(Base, ModelBase):
     id = Column(BigInteger, primary_key=True, index=True)
     status_id = Column(ForeignKey('event_status.id'), nullable=True)
     coefficient = Column(Float, nullable=False)
-    deadline = Column(DateTime(timezone=True))
+    deadline_ts = Column(BigInteger)
     updated_at = Column(DateTime(timezone=True), onupdate=datetime.utcnow)
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)

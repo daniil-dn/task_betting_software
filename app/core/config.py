@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 from dotenv import load_dotenv
-from pydantic import AnyHttpUrl, validator
+from pydantic import AnyHttpUrl, validator, PostgresDsn
 from pydantic_settings import BaseSettings
 
 load_dotenv('.env_uvicorn')
@@ -94,6 +94,28 @@ class Settings(BaseSettings):
 
         else:
             return BASE_DIR / 'logs'
+
+    """DATABASE CONFIG"""
+    POSTGRES_SERVER: str
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_DB: str
+    SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
+    SQLALCHEMY_DATABASE_SYNC_URI: Optional[PostgresDsn] = None
+
+    @validator("SQLALCHEMY_DATABASE_URI", pre=True)
+    def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
+        if isinstance(v, str):
+            return v
+        user = values.get("POSTGRES_USER")
+        password = values.get("POSTGRES_PASSWORD")
+        host = values.get("POSTGRES_SERVER")
+        db = values.get("POSTGRES_DB")
+
+        if all([user, password, host, db]):
+            return f"postgresql+asyncpg://{user}:{password}@{host}/{db}"
+        else:
+            return None
 
     class Config:
         case_sensitive = True

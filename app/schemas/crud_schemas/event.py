@@ -14,18 +14,18 @@ class EventInDB(EventBase):
     id: int
     status_id: int
     coefficient: decimal.Decimal
-    deadline: datetime
+    deadline_ts: int
     updated_at: datetime
     created_at: datetime
 
 
 class EventCreate(EventBase):
     coefficient: decimal.Decimal
-    deadline: datetime
+    deadline_ts: int
 
 
 class EventUpdate(EventBase):
     id: int
     status_id: Optional[int] = None
     coefficient: Optional[decimal.Decimal] = None
-    deadline: Optional[datetime] = None
+    deadline_ts: Optional[int] = None
