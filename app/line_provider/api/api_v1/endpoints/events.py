@@ -29,7 +29,10 @@ async def create_event(message_in: api_schemas.EventCreateAPI, db: AsyncSession 
 
 @router.get('/event/{event_id}', response_model=crud_schemas.EventInDB)
 async def get_event(event_id: int, db: AsyncSession = Depends(deps.get_db)):
-    return await crud_event.get_by_id(db, id=event_id)
+    event = await crud_event.get_by_id(db, id=event_id)
+    if not event:
+        raise HTTPException(status_code=404, detail='Event not found')
+    return event
 
 
 @router.get('/events', response_model=List[crud_schemas.EventInDB])

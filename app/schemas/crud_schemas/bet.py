@@ -15,13 +15,14 @@ class BetInDB(BetBase):
     event_id: int
     status_id: int
     amount: decimal.Decimal
-    updated_at: datetime
+    updated_at: Optional[datetime] = None
     created_at: datetime
 
 
 class BetCreate(BetBase):
     event_id: int
     amount: decimal.Decimal
+    status_id: int
 
 
 class BetUpdate(BetBase):

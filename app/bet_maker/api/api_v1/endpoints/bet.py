@@ -1,6 +1,10 @@
-from typing import Any
+import json
+from datetime import datetime
+from typing import Any, List
 
-from fastapi import APIRouter, Depends
+import aiohttp
+import pytz
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bet_maker.schemas import api_schemas
@@ -18,12 +22,23 @@ async def bet(
         message_in: api_schemas.BetCreateAPI,
         db: AsyncSession = Depends(deps.get_db),
 ) -> Any:
-    await crud_bet.create(db, obj_in=crud_schemas.BetCreate(**message_in.model_dump()))
+    async with aiohttp.ClientSession(trust_env=True) as session:
+        async with session.get(f"http://app_line_provider:9090/api/v1/event/{message_in.event_id}") as response:
+            content = await response.content.read()
+            if response.status != 200:
+                raise HTTPException(status_code=404, detail='Event not found')
+
+    event_dict = json.loads(content.decode('utf-8'))
+    event = crud_schemas.EventInDB(**event_dict)
+    if event.status_id != 1 or event.deadline_dt < datetime.now(tz=pytz.UTC):
+        raise HTTPException(status_code=400, detail='You cant bet on this event')
+    await crud_bet.create(db, obj_in=crud_schemas.BetCreate(**message_in.model_dump(), status_id=1))
 
 
-@router.get("/bet")
-async def bet(
+@router.get("/bets", response_model=List[crud_schemas.BetInDB])
+async def bets(
+        db: AsyncSession = Depends(deps.get_db),
 ) -> Any:
     """
         """
-    pass
+    return await crud_bet.get_all(db)
