@@ -67,10 +67,6 @@ class Settings(BaseSettings):
     # PYTHONPATH
     PYTHONPATH: str
 
-    """USERBOT CONFIG"""
-    USER_BOT_API_ID: int
-    USER_BOT_API_HASH: str
-
     # logger config
     LOGGER_PATH: Path = None
     LOGGER_ROTATION: str = "10 MB"
