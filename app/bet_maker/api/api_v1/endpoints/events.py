@@ -7,8 +7,8 @@ from fastapi import APIRouter
 router = APIRouter()
 
 
-@router.post("/", response_model=Any)
-async def test(
+@router.get("/events", response_model=Any)
+async def events(
         message_in: Any
 ) -> Any:
     """

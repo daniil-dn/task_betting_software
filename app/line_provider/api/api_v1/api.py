@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api_line_provider.api_v1.endpoints import bot
+from app.line_provider.api.api_v1.endpoints import events
 
 api_router = APIRouter()
-api_router.include_router(bot.router, prefix="/bot", tags=["bot"])
+api_router.include_router(events.router, prefix="", tags=["events"])

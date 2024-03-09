@@ -7,9 +7,16 @@ from fastapi import APIRouter
 router = APIRouter()
 
 
-@router.post("/", response_model=Any)
-async def test(
-        message_in: Any
+@router.post("/bet")
+async def bet(
+) -> Any:
+    """
+        """
+    return
+
+
+@router.get("/bet")
+async def bet(
 ) -> Any:
     """
         """
