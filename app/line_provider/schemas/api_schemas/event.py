@@ -1,4 +1,5 @@
 import decimal
+from datetime import datetime
 
 from pydantic import BaseModel, field_validator
 
@@ -10,7 +11,7 @@ class EventBase(BaseModel):
 # --- API ---
 class EventCreateAPI(EventBase):
     coefficient: decimal.Decimal
-    deadline_ts: int
+    deadline_ts: datetime
 
     @field_validator('coefficient', mode='before')
     def must_two_decimals(cls, v):

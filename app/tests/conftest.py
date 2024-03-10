@@ -1,3 +1,4 @@
+import asyncio
 from typing import Generator
 
 import pytest
@@ -9,9 +10,16 @@ from app.start_bet_maker import app
 
 
 @pytest.fixture(scope="session")
-def db() -> Generator:
+def event_loop(request):
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
+
+
+@pytest.fixture(scope="function", autouse=True)
+def session():
     tests_log.info("CREATE DB")
-    yield SessionLocal()
+    return SessionLocal()
 
 
 @pytest.fixture(scope="module")
