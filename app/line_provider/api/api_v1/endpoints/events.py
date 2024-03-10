@@ -14,7 +14,10 @@ router = APIRouter()
 
 
 @router.put('/event', response_model=crud_schemas.EventInDB)
-async def create_event(message_in: api_schemas.EventCreateAPI, db: AsyncSession = Depends(deps.get_db)):
+async def create_event(
+        message_in: api_schemas.EventCreateAPI,
+        db: AsyncSession = Depends(deps.get_db)
+):
     # message_in.deadline_ts - уже переведо из timestamp -> datetime
     event_data = crud_schemas.EventCreate(
         coefficient=message_in.coefficient, deadline_dt=message_in.deadline_ts, status_id=1

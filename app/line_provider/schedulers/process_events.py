@@ -14,12 +14,16 @@ async def process_events():
     # todo воркер arq
     scheduler_log.info('PROCESS EVENTS')
     async with SessionLocal() as db:
-        events_statuses = await crud_event_status.get_all(db)
-        status_ids = [status.id for status in events_statuses if status.name_id != 'not_finished']
-        events = await crud_event.get_all_not_processed(db)
+        events_statuses: list[crud_schemas.EventStatusInDB] = await crud_event_status.get_all(db)
+        status_ids: list[int] = [status.id for status in events_statuses
+                                 if status.name_id != 'not_finished']
+        events: list[crud_schemas.EventInDB] = await crud_event.get_all_not_processed(db)
         for event in events:
-            deadline_dt = event.deadline_dt
+            deadline_dt: datetime = event.deadline_dt
             if deadline_dt <= datetime.now(tz=pytz.UTC):
-                event_data = crud_schemas.EventUpdate(id=event.id, status_id=random.choice(status_ids))
+                event_data = crud_schemas.EventUpdate(
+                    id=event.id,
+                    status_id=random.choice(status_ids)
+                )
                 await crud_event.update(db, db_obj=event, obj_in=event_data)
     scheduler_log.info('END PROCESS EVENTS')

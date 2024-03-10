@@ -9,7 +9,11 @@ from app.models import Bet
 from app.schemas import crud_schemas
 
 
-class CRUDBet(CRUDBase[Bet, crud_schemas.BetCreate, crud_schemas.BetUpdate]):
+class CRUDBet(
+    CRUDBase[Bet,
+    crud_schemas.BetCreate,
+    crud_schemas.BetUpdate]
+    ):
     async def get_all_not_processed(
             self, db: AsyncSession
     ) -> List[Bet]:

@@ -4,7 +4,12 @@ from app.models import EventStatus
 from app.schemas import crud_schemas
 
 
-class CRUDEventStatus(CRUDBase[EventStatus, crud_schemas.EventStatusCreate, crud_schemas.EventUpdate]):
+class CRUDEventStatus(
+    CRUDBase[
+        EventStatus,
+        crud_schemas.EventStatusCreate,
+        crud_schemas.EventUpdate]
+):
     pass
 
 

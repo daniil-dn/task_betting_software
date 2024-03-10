@@ -4,7 +4,11 @@ from app.models import BetStatus
 from app.schemas import crud_schemas
 
 
-class CRUDBetStatus(CRUDBase[BetStatus, crud_schemas.BetStatusCreate, crud_schemas.BetStatusUpdate]):
+class CRUDBetStatus(
+    CRUDBase[BetStatus,
+    crud_schemas.BetStatusCreate,
+    crud_schemas.BetStatusUpdate]
+):
     pass
 
 

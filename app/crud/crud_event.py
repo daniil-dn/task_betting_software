@@ -11,7 +11,12 @@ from app.models import Event
 from app.schemas import crud_schemas
 
 
-class CRUDEvent(CRUDBase[Event, crud_schemas.EventCreate, crud_schemas.EventUpdate]):
+class CRUDEvent(
+    CRUDBase[
+        Event,
+        crud_schemas.EventCreate,
+        crud_schemas.EventUpdate]
+):
     async def get_all_not_processed(
             self, db: AsyncSession
     ) -> List[Event]:
@@ -22,7 +27,10 @@ class CRUDEvent(CRUDBase[Event, crud_schemas.EventCreate, crud_schemas.EventUpda
     async def get_all_can_bet(
             self, db: AsyncSession
     ) -> List[Event]:
-        q = select(Event).filter(Event.deadline_dt >= datetime.now(tz=pytz.UTC), Event.status_id == 1)
+        q = select(Event).filter(
+            Event.deadline_dt >= datetime.now(tz=pytz.UTC),
+            Event.status_id == 1
+        )
         res = await db.execute(q)
         return res.scalars().all()
 

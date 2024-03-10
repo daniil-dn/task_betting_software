@@ -25,4 +25,4 @@ app = FastAPI(
 )
 instrumentator.instrument(app).expose(app)
 app.include_router(api_router, prefix=settings.API_V1_STR)
-server_log.info(f'CREATE FASTAPI APP')
+server_log.info('CREATE FASTAPI APP')

@@ -11,7 +11,9 @@ from app.schemas import crud_schemas
 
 async def process_bet(db, bet):
     async with aiohttp.ClientSession(trust_env=True) as session:
-        async with session.get(f"http://app_line_provider:9090/api/v1/event/{bet.event_id}") as response:
+        async with session.get(
+                f"http://app_line_provider:9090/api/v1/event/{bet.event_id}"
+        ) as response:
             content = await response.content.read()
             if response.status != 200:
                 scheduler_log.error(f'Event error: {content}')
