@@ -1,13 +1,9 @@
 version: '3.5'
 
-networks:
-  default:
-    name: bot_maker
-    external: true
 services:
-  app_bot_maker:
+  app_bet_maker:
     build: .
-    image: bot_maker
+    image: bet_maker
     ports:
       - "9090:9090"
     volumes:
@@ -28,7 +24,7 @@ services:
       - SERVER_HOST=http://localhost
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=anihortes
-      - POSTGRES_SERVER=postgresql_db_bot_maker
+      - POSTGRES_SERVER=postgresql_db_bet_maker
       - POSTGRES_DB=postgres
       - LOGGER_ROTATION=10 MB
       - LOGGER_COMPRESSION=zip
@@ -62,7 +58,7 @@ services:
       - SERVER_HOST=http://localhost
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=anihortes
-      - POSTGRES_SERVER=postgresql_db_bot_maker
+      - POSTGRES_SERVER=postgresql_db_bet_maker
       - POSTGRES_DB=postgres
       - LOGGER_ROTATION=10 MB
       - LOGGER_COMPRESSION=zip
@@ -91,7 +87,7 @@ services:
     dns:
       - 0.0.0.0
   db:
-    container_name: postgresql_db_bot_maker
+    container_name: postgresql_db_bet_maker
     image: postgres:13
     ports:
       - "5432:5432"

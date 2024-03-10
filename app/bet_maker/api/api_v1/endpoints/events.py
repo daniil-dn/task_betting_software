@@ -19,5 +19,4 @@ async def events(
     async with aiohttp.ClientSession(trust_env=True) as session:
         async with session.get("http://app_line_provider:9090/api/v1/events") as response:
             content = await response.content.read()
-    print(content)
     return json.loads(content.decode('utf-8'))

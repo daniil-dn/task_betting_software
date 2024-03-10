@@ -14,7 +14,7 @@ class EventCreateAPI(EventBase):
     deadline_ts: datetime
 
     @field_validator('coefficient', mode='before')
-    def must_two_decimals(self, v):
+    def must_two_decimals(cls, v):
         if '.' in str(v) and len(str(v).rsplit('.')[-1]) > 2:
             raise ValueError('must contain two decimals')
         return v
