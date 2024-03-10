@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 from dotenv import load_dotenv
-from pydantic import AnyHttpUrl, validator, PostgresDsn
+from pydantic import AnyHttpUrl, PostgresDsn, model_validator, field_validator
 from pydantic_settings import BaseSettings
 
 load_dotenv('.env_uvicorn')
@@ -13,13 +13,16 @@ class Settings(BaseSettings):
     """SERVER CONFIG"""
     DEBUG: Optional[bool] = True
 
-    @validator("DEBUG", pre=True)
-    def assemble_debug(cls, v: Union[str, List[str]], values: Dict[str, Any]) -> Any:
-
-        if v:
-            return v
-        else:
-            return False
+    @model_validator(mode='before')
+    @classmethod
+    def model_validator(cls, values: Any) -> Any:
+        if not values.get('DEBUG'):
+            values['DEBUG'] = False
+        cls.assemble_armq_url(values)
+        cls.assemble_logger_level(values)
+        cls.assemble_logger_path(values)
+        cls.assemble_db_connection(values)
+        return values
 
     API_V1_STR: str = "/api/v1"
 
@@ -31,11 +34,10 @@ class Settings(BaseSettings):
     RABBITMQ_PASSWORD: str
     ARMQ_URL: str = None
 
-    @validator("ARMQ_URL", pre=True)
-    def assemble_armq_url(cls, v: Optional[str], values: Dict[str, Any]):
-        if isinstance(v, str):
-            print(v)
-            return v
+    @classmethod
+    def assemble_armq_url(cls, values: Dict[str, Any]):
+        if isinstance(values.get("ARMQ_URL"), str):
+            return
 
         host = values.get("RABBITMQ_HOST")
         port = values.get("RABBITMQ_PORT")
@@ -43,9 +45,9 @@ class Settings(BaseSettings):
         password = values.get("RABBITMQ_PASSWORD")
 
         if all([host, port, login, password]):
-            return f"amqp://{login}:{password}@{host}:{port}"
+            values["ARMQ_URL"] = f"amqp://{login}:{password}@{host}:{port}"
         else:
-            return None
+            values["ARMQ_URL"] = None
 
     SERVER_HOST: AnyHttpUrl
 
@@ -54,7 +56,8 @@ class Settings(BaseSettings):
     # "http://localhost:8080", "http://local.dockertoolbox.tiangolo.com"]'
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
 
-    @validator("BACKEND_CORS_ORIGINS", pre=True)
+    @field_validator("BACKEND_CORS_ORIGINS", mode='before')
+    @classmethod
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
         if isinstance(v, str) and not v.startswith("["):
             return [i.strip() for i in v.split(",")]
@@ -74,26 +77,25 @@ class Settings(BaseSettings):
     LOGGER_DEBUG: bool = False
     LOGGER_LEVELS: list = []
 
-    @validator("LOGGER_LEVELS", pre=True)
-    def assemble_logger_level(cls, v: Optional[list], values: Dict[str, Any]) -> Any:
-
+    @classmethod
+    def assemble_logger_level(cls, values: Dict[str, Any]) -> Any:
         debug_lvl = values.get("LOGGER_DEBUG")
 
         if debug_lvl is True:
-            return ["INFO", "DEBUG", "ERROR"]
+            values["LOGGER_LEVELS"] = ["INFO", "DEBUG", "ERROR"]
         else:
-            return ["INFO", "ERROR"]
+            values["LOGGER_LEVELS"] = ["INFO", "ERROR"]
 
-    @validator("LOGGER_PATH", pre=True)
-    def assemble_logger_path(cls, v: Optional[list], values: Dict[str, Any]) -> Any:
+    @classmethod
+    def assemble_logger_path(cls, values: Dict[str, Any]) -> Any:
 
         python_path = values.get("PYTHONPATH")
 
         if python_path:
-            return Path(python_path).resolve() / 'app' / 'logs'
+            values['LOGGER_PATH'] = Path(python_path).resolve() / 'app' / 'logs'
 
         else:
-            return BASE_DIR / 'logs'
+            values['LOGGER_PATH'] = BASE_DIR / 'logs'
 
     """DATABASE CONFIG"""
     POSTGRES_SERVER: str
@@ -103,19 +105,19 @@ class Settings(BaseSettings):
     SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
     SQLALCHEMY_DATABASE_SYNC_URI: Optional[PostgresDsn] = None
 
-    @validator("SQLALCHEMY_DATABASE_URI", pre=True)
-    def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
-        if isinstance(v, str):
-            return v
+    @classmethod
+    def assemble_db_connection(cls, values: Dict[str, Any]) -> Any:
+        if isinstance(values.get("SQLALCHEMY_DATABASE_URI"), str):
+            return
         user = values.get("POSTGRES_USER")
         password = values.get("POSTGRES_PASSWORD")
         host = values.get("POSTGRES_SERVER")
         db = values.get("POSTGRES_DB")
 
         if all([user, password, host, db]):
-            return f"postgresql+asyncpg://{user}:{password}@{host}/{db}"
+            values["SQLALCHEMY_DATABASE_URI"] = f"postgresql+asyncpg://{user}:{password}@{host}/{db}"
         else:
-            return None
+            values["SQLALCHEMY_DATABASE_URI"] = None
 
     class Config:
         case_sensitive = True

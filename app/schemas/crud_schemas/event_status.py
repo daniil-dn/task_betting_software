@@ -17,7 +17,9 @@ class EventStatusInDB(EventStatusBase):
 
 
 class EventStatusCreate(EventStatusBase):
-    pass
+    id: int
+    name_id: str
+    name: str
 
 
 class EventStatusUpdate(EventStatusBase):

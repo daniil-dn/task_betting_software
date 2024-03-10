@@ -37,4 +37,4 @@ async def get_event(event_id: int, db: AsyncSession = Depends(deps.get_db)):
 
 @router.get('/events', response_model=List[crud_schemas.EventInDB])
 async def get_events(db: AsyncSession = Depends(deps.get_db)):
-    return await crud_event.get_all(db)
+    return await crud_event.get_all_can_bet(db)

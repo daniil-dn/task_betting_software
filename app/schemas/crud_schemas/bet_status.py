@@ -17,7 +17,9 @@ class BetStatusInDB(BetStatusBase):
 
 
 class BetStatusCreate(BetStatusBase):
-    pass
+    id: int
+    name_id: str
+    name: str
 
 
 class BetStatusUpdate(BetStatusBase):

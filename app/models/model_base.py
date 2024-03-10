@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declared_attr
 
 class ModelBase:
     __name__: str
-
+    __table_args__ = {'extend_existing': True}
     # Generate __tablename__ automatically
     @declared_attr
     def __tablename__(cls) -> str:

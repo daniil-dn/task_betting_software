@@ -20,7 +20,6 @@ services:
     environment:
       - DEBUG=True
       - PROJECT_NAME=BOT_API
-      - ARMQ_URL=amqp://tgk:9Z3JTJzv4ttklypA9g_UJdRT@data.opl.infrapu.sh:5672/tgk
       - RABBITMQ_HOST=localhost
       - RABBITMQ_PORT=5672
       - RABBITMQ_LOGIN=user
@@ -55,7 +54,6 @@ services:
     environment:
       - DEBUG=True
       - PROJECT_NAME=BOT_API
-      - ARMQ_URL=amqp://tgk:9Z3JTJzv4ttklypA9g_UJdRT@data.opl.infrapu.sh:5672/tgk
       - RABBITMQ_HOST=localhost
       - RABBITMQ_PORT=5672
       - RABBITMQ_LOGIN=user
