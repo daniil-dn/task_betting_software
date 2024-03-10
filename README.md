@@ -11,7 +11,7 @@ After first run:
    alembic revision --autogenerate -m "Migration"
    alembic upgrade head
 2) Run python pre_start_fill_db.py to fill db with statuses
-3) 
+
 Visit  (http://localhost:9090/docs, http://localhost:9091/docs) for the interactive FastAPI docs!
 
 1. Выбрал связь между микросервисами по http. Все-таки rabbit в данном случае избыточен, но с другой стороны идеально
