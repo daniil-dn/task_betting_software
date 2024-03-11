@@ -13,6 +13,9 @@ class Settings(BaseSettings):
     """SERVER CONFIG"""
     DEBUG: Optional[bool] = True
 
+    REDIS_PORT: int = None
+    REDIS_HOST: str = None
+
     @model_validator(mode='before')
     @classmethod
     def model_validator(cls, values: Any) -> Any:

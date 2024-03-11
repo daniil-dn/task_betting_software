@@ -15,6 +15,8 @@ bet_maker_api_log = add_named_logger('bet_maker_api')
 # Scheduler
 scheduler_log = add_named_logger('scheduler')
 
+# RQ
+process_event_log = add_named_logger('scheduler')
 
 # tests
-tests_log  = add_named_logger('tests')
+tests_log = add_named_logger('tests')

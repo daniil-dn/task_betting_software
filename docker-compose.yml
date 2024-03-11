@@ -20,7 +20,7 @@ services:
       - RABBITMQ_PORT=5672
       - RABBITMQ_LOGIN=user
       - RABBITMQ_PASSWORD=user
-      - SERVER_NAME=BOT_API
+      - SERVER_NAME=Bet_Maker_API
       - SERVER_HOST=http://localhost
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=anihortes
@@ -29,8 +29,8 @@ services:
       - LOGGER_ROTATION=10 MB
       - LOGGER_COMPRESSION=zip
       - LOGGER_DEBUG=True
-      - REDIS_PORT=6378
-      - REDIS_HOST=rq_redis
+      - REDIS_PORT=6379
+      - REDIS_HOST=rq_redis_bet
     tty: true
     stdin_open: true
     dns:
@@ -45,6 +45,7 @@ services:
       - .:/app
     depends_on:
       - rabbitmq
+      - worker_line_provider
     command: uvicorn app.start_line_provider:app --host 0.0.0.0 --port 9090 --reload
 
     environment:
@@ -54,7 +55,7 @@ services:
       - RABBITMQ_PORT=5672
       - RABBITMQ_LOGIN=user
       - RABBITMQ_PASSWORD=user
-      - SERVER_NAME=BOT_API
+      - SERVER_NAME=Line_Provider_API
       - SERVER_HOST=http://localhost
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=anihortes
@@ -63,8 +64,8 @@ services:
       - LOGGER_ROTATION=10 MB
       - LOGGER_COMPRESSION=zip
       - LOGGER_DEBUG=True
-      - REDIS_PORT=6378
-      - REDIS_HOST=rq_redis
+      - REDIS_PORT=6379
+      - REDIS_HOST=rq_redis_bet
     tty: true
     stdin_open: true
     dns:
@@ -106,7 +107,7 @@ services:
     dns:
       - 0.0.0.0
   redis:
-    container_name: rq_redis
+    container_name: rq_redis_bet
     image: bitnami/redis:6.2.1
     environment:
       # ALLOW_EMPTY_PASSWORD is recommended only for development.
@@ -115,5 +116,30 @@ services:
       - "6379:6379"
     networks:
       - default
+  worker_line_provider:
+    build: .
+    depends_on:
+      - redis
+    command: python3.10 app/run_line_provider_worker_async.py
+    networks:
+      - default
+    environment:
+      - DEBUG=True
+      - PROJECT_NAME=BOT_API
+      - RABBITMQ_HOST=localhost
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_LOGIN=user
+      - RABBITMQ_PASSWORD=user
+      - SERVER_NAME=Line_Provider_API
+      - SERVER_HOST=http://localhost
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=anihortes
+      - POSTGRES_SERVER=postgresql_db_bet_maker
+      - POSTGRES_DB=postgres
+      - LOGGER_ROTATION=10 MB
+      - LOGGER_COMPRESSION=zip
+      - LOGGER_DEBUG=True
+      - REDIS_PORT=6379
+      - REDIS_HOST=rq_redis_bet
 volumes:
   postgres_data:
