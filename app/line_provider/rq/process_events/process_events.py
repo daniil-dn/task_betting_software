@@ -11,6 +11,7 @@ from app.schemas import crud_schemas
 
 
 async def process_events(ctx: dict):
+    """Проводится обработка событий и создание тасков для каждого"""
     process_event_log.info('Process Events')
     async with SessionLocal() as db:
         events_statuses: list[crud_schemas.EventStatusInDB] = await crud_event_status.get_all(db)

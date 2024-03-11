@@ -5,12 +5,8 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-class EventBase(BaseModel):
-    pass
-
-
 # --- API ---
-class EventGet(EventBase):
+class EventGet(BaseModel):
     id: int
     status_id: Optional[int]
     coefficient: decimal.Decimal

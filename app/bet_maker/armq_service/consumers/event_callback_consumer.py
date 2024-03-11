@@ -42,9 +42,10 @@ class Consumer:
             message: aio_pika.abc.AbstractIncomingMessage,
     ) -> None:
         async with message.process(requeue=True):
-            armq_bet_maker_log.info(message.body)
+
             data_dict: dict = json.loads(message.body)
             data = EventCallback(**data_dict)
+            armq_bet_maker_log.info(f"Process Event Callback id:{data.id} status:{data.status_id}")
             async with SessionLocal() as db:
                 bets_with_event: list[Bet] = await crud_bet.get_by_event_id(
                     db,

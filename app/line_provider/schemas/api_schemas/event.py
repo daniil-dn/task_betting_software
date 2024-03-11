@@ -5,14 +5,12 @@ from typing import Optional
 from pydantic import BaseModel, field_validator
 
 
-class EventBase(BaseModel):
-    pass
-
-
 # --- API ---
-class EventCreateAPI(EventBase):
+class EventCreateAPI(BaseModel):
     coefficient: decimal.Decimal
     deadline_ts: datetime
+
+    # deadline_ts - преобразовывается в datetime
 
     @field_validator('coefficient', mode='before')
     def must_two_decimals(cls, v):
@@ -21,7 +19,7 @@ class EventCreateAPI(EventBase):
         return v
 
 
-class EventGet(EventBase):
+class EventCallback(BaseModel):
     id: int
     status_id: Optional[int]
     coefficient: decimal.Decimal

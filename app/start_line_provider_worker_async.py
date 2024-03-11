@@ -3,6 +3,8 @@ import asyncio
 from app.arq_redis.worker import create_worker
 from app.line_provider.rq.workers import WorkerProcessEventsSettings
 
+__doc__ = """Запуск воркера arq для line_provider"""
+
 
 async def main():
     worker_process_events = create_worker(WorkerProcessEventsSettings)

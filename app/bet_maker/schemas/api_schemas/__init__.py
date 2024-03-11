@@ -1,2 +1,2 @@
-from .bet import BetBase, BetCreateAPI, BetGetResponseAPI
+from .bet import BetCreateAPI, BetGetResponseAPI
 from .event import EventGet

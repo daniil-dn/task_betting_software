@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.bet_maker.schemas import api_schemas
 from app.core import deps
 from app.crud import crud_bet, crud_bet_status
+from app.logs import server_log
 from app.models import Bet, BetStatus
 from app.schemas import crud_schemas
 
@@ -29,9 +30,9 @@ async def bet(
             content: bytes = await response.content.read()
             if response.status != 200:
                 raise HTTPException(status_code=404, detail='Event not found')
-
     event_dict: dict = json.loads(content.decode('utf-8'))
     event = crud_schemas.EventInDB(**event_dict)
+    server_log.debug(f'Get event for bet id:{event.id} status:{event.status_id}')
     if event.status_id != 1 or event.deadline_dt < datetime.now(tz=pytz.UTC):
         raise HTTPException(status_code=400, detail='You cant bet on this event')
     bet_indb: Bet = await crud_bet.create(
@@ -41,6 +42,7 @@ async def bet(
             status_id=1
         )
     )
+    server_log.debug(f'Created bet id:{bet_indb.id} status:{bet_indb.status_id}')
     return api_schemas.BetGetResponseAPI(**bet_indb.__dict__, status='ещё не сыграла')
 
 
@@ -50,6 +52,7 @@ async def bets(
 ) -> Any:
     bet_statuses_db: list[BetStatus] = await crud_bet_status.get_all(db)
     bet_statuses_dict: dict = {bet_status.id: bet_status.name for bet_status in bet_statuses_db}
+    server_log.debug(f"Get all Bets len:{len(bet_statuses_db)} status names:{bet_statuses_dict}")
     return [
         api_schemas.BetGetResponseAPI(**bet.__dict__, status=bet_statuses_dict[bet.status_id])
         for bet in await crud_bet.get_all(db)]

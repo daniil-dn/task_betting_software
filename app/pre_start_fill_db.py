@@ -6,6 +6,8 @@ from app.logs import server_log
 from app.models import EventStatus, BetStatus
 from app.schemas import crud_schemas
 
+__doc__ = """Заполняет базу данных при старте приложения"""
+
 
 async def fill_db():
     async with SessionLocal() as db:

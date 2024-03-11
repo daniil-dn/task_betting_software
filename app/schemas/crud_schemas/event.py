@@ -5,12 +5,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-# Shared properties
-class EventBase(BaseModel):
-    pass
-
-
-class EventInDB(EventBase):
+class EventInDB(BaseModel):
     id: int
     status_id: Optional[int]
     coefficient: decimal.Decimal
@@ -19,13 +14,13 @@ class EventInDB(EventBase):
     created_at: datetime
 
 
-class EventCreate(EventBase):
+class EventCreate(BaseModel):
     coefficient: decimal.Decimal
     deadline_dt: datetime
     status_id: int
 
 
-class EventUpdate(EventBase):
+class EventUpdate(BaseModel):
     id: int
     status_id: Optional[int] = None
     coefficient: Optional[decimal.Decimal] = None

@@ -9,6 +9,8 @@ from app.line_provider.api.api_v1.api import api_router
 from app.logs import server_log
 from app.metrics_prometheus import instrumentator
 
+__doc__ = """Запуск апи для line_provider"""
+
 server_log.info(f'Sentry is ON. Debug Mode is {settings.DEBUG}')
 
 # Запуск приложения. При запуске стартует клиент ТГ и при выключении происходит диссконнект клиента

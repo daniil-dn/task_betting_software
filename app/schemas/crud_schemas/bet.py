@@ -6,11 +6,8 @@ from pydantic import BaseModel
 
 
 # Shared properties
-class BetBase(BaseModel):
-    pass
 
-
-class BetInDB(BetBase):
+class BetInDB(BaseModel):
     id: int
     event_id: int
     status_id: int
@@ -19,13 +16,13 @@ class BetInDB(BetBase):
     created_at: datetime
 
 
-class BetCreate(BetBase):
+class BetCreate(BaseModel):
     event_id: int
     amount: decimal.Decimal
     status_id: int
 
 
-class BetUpdate(BetBase):
+class BetUpdate(BaseModel):
     id: int
     event_id: Optional[int] = None
     amount: Optional[decimal.Decimal] = None

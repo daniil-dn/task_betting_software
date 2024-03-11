@@ -4,23 +4,18 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-# Shared properties
-class BetStatusBase(BaseModel):
-    pass
-
-
-class BetStatusInDB(BetStatusBase):
+class BetStatusInDB(BaseModel):
     id: int
     name_id: Optional[str]
     name: Optional[str]
     created_at: datetime
 
 
-class BetStatusCreate(BetStatusBase):
+class BetStatusCreate(BaseModel):
     id: int
     name_id: str
     name: str
 
 
-class BetStatusUpdate(BetStatusBase):
+class BetStatusUpdate(BaseModel):
     pass

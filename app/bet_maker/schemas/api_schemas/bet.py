@@ -5,12 +5,7 @@ from typing import Optional
 from pydantic import BaseModel, field_validator
 
 
-class BetBase(BaseModel):
-    pass
-
-
-# --- API ---
-class BetCreateAPI(BetBase):
+class BetCreateAPI(BaseModel):
     event_id: int
     amount: decimal.Decimal
 
@@ -21,7 +16,7 @@ class BetCreateAPI(BetBase):
         return v
 
 
-class BetGetResponseAPI(BetBase):
+class BetGetResponseAPI(BaseModel):
     id: int
     event_id: int
     status: str

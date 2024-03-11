@@ -15,8 +15,10 @@ from app.schemas import crud_schemas
 
 
 async def process_event(ctx: dict, message_in: ProcessEventTask):
+    """Проводится обработка события и отправка коллбэка в реббит для bet_maker"""
     process_event_log.info(f'process event {message_in.event_id}')
     async with SessionLocal() as db:
+        # получем событие
         event: Event = await crud_event.get_by_id(db, id=message_in.event_id)
         deadline_dt: datetime = event.deadline_dt
         if deadline_dt <= datetime.now(tz=pytz.UTC) and event.status_id == 1:
@@ -27,7 +29,7 @@ async def process_event(ctx: dict, message_in: ProcessEventTask):
             )
             event: Event = await crud_event.update(db, db_obj=event, obj_in=event_data)
 
-    event_data = api_schemas.EventGet(
+    event_data = api_schemas.EventCallback(
         id=event.id, status_id=event.status_id, coefficient=event.coefficient,
         deadline_dt=event.deadline_dt, updated_at=event.updated_at,
         created_at=event.created_at
@@ -43,5 +45,5 @@ async def process_event(ctx: dict, message_in: ProcessEventTask):
             routing_key='event_callback',
 
         )
-        armq.close()
+        await armq.close()
     process_event_log.info(f'END process_event {message_in.event_id}')
