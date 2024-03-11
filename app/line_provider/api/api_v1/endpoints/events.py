@@ -34,6 +34,7 @@ async def get_event(event_id: int, db: AsyncSession = Depends(deps.get_db)):
     server_log.debug(f'Get event id:{event_id}')
     event: Event = await crud_event.get_by_id(db, id=event_id)
     if not event:
+        # Если события нет ошибка 404
         raise HTTPException(status_code=404, detail='Event not found')
     return event
 

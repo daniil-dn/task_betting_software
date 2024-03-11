@@ -21,6 +21,8 @@ async def process_event(ctx: dict, message_in: ProcessEventTask):
         # получем событие
         event: Event = await crud_event.get_by_id(db, id=message_in.event_id)
         deadline_dt: datetime = event.deadline_dt
+
+        # если событие не завершено и время его дедлайна прошло
         if deadline_dt <= datetime.now(tz=pytz.UTC) and event.status_id == 1:
             event: Event = await crud_event.lock_row(db, id=message_in.event_id)
             event_data = crud_schemas.EventUpdate(
@@ -28,7 +30,7 @@ async def process_event(ctx: dict, message_in: ProcessEventTask):
                 status_id=random.choice(message_in.status_ids)
             )
             event: Event = await crud_event.update(db, db_obj=event, obj_in=event_data)
-
+    # отправляем коллбэк
     event_data = api_schemas.EventCallback(
         id=event.id, status_id=event.status_id, coefficient=event.coefficient,
         deadline_dt=event.deadline_dt, updated_at=event.updated_at,

@@ -24,15 +24,18 @@ async def bet(
         message_in: api_schemas.BetCreateAPI,
         db: AsyncSession = Depends(deps.get_db),
 ) -> Any:
+    # Получаем событие из сервиса провайдера
     async with aiohttp.ClientSession(trust_env=True) as session:
         url_get_event = f"http://app_line_provider:9090/api/v1/event/{message_in.event_id}"
         async with session.get(url_get_event) as response:
             content: bytes = await response.content.read()
             if response.status != 200:
                 raise HTTPException(status_code=404, detail='Event not found')
+    # Получаем данные собятия из ответа и валидируем
     event_dict: dict = json.loads(content.decode('utf-8'))
     event = crud_schemas.EventInDB(**event_dict)
     server_log.debug(f'Get event for bet id:{event.id} status:{event.status_id}')
+    # Проверяем статус и время дедлайна
     if event.status_id != 1 or event.deadline_dt < datetime.now(tz=pytz.UTC):
         raise HTTPException(status_code=400, detail='You cant bet on this event')
     bet_indb: Bet = await crud_bet.create(
@@ -50,7 +53,9 @@ async def bet(
 async def bets(
         db: AsyncSession = Depends(deps.get_db),
 ) -> Any:
+    # Получаем все статусы бетов
     bet_statuses_db: list[BetStatus] = await crud_bet_status.get_all(db)
+    # Собираем имена статусов
     bet_statuses_dict: dict = {bet_status.id: bet_status.name for bet_status in bet_statuses_db}
     server_log.debug(f"Get all Bets len:{len(bet_statuses_db)} status names:{bet_statuses_dict}")
     return [
