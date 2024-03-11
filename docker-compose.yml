@@ -105,6 +105,15 @@ services:
       - default
     dns:
       - 0.0.0.0
-
+  redis:
+    container_name: rq_redis
+    image: bitnami/redis:6.2.1
+    environment:
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - "6379:6379"
+    networks:
+      - default
 volumes:
   postgres_data:
