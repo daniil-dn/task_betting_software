@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core import deps
 from app.crud import crud_event
 from app.line_provider.schemas import api_schemas
+from app.models import Event
 from app.schemas import crud_schemas
 
 # app
@@ -27,7 +28,7 @@ async def create_event(
 
 @router.get('/event/{event_id}', response_model=crud_schemas.EventInDB)
 async def get_event(event_id: int, db: AsyncSession = Depends(deps.get_db)):
-    event = await crud_event.get_by_id(db, id=event_id)
+    event: Event = await crud_event.get_by_id(db, id=event_id)
     if not event:
         raise HTTPException(status_code=404, detail='Event not found')
     return event

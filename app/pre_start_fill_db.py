@@ -3,14 +3,15 @@ import asyncio
 from app.crud import crud_bet_status, crud_event_status
 from app.db import SessionLocal
 from app.logs import server_log
+from app.models import EventStatus, BetStatus
 from app.schemas import crud_schemas
 
 
 async def fill_db():
     async with SessionLocal() as db:
         server_log.info('FILL DB')
-        events_statuses = await crud_event_status.get_all(db)
-        bets_statuses = await crud_bet_status.get_all(db)
+        events_statuses: list[EventStatus] = await crud_event_status.get_all(db)
+        bets_statuses: list[BetStatus] = await crud_bet_status.get_all(db)
         if not events_statuses:
             await crud_event_status.create(
                 db, obj_in=crud_schemas.EventStatusCreate(

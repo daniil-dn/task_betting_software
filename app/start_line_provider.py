@@ -16,7 +16,7 @@ from app.metrics_prometheus import instrumentator
 server_log.info(f'Sentry is ON. Debug Mode is {settings.DEBUG}')
 
 scheduler = AsyncIOScheduler({'event_loop': asyncio.get_event_loop()})
-scheduler.add_job(process_events, 'interval', seconds=60, next_run_time=datetime.now())
+scheduler.add_job(process_events, 'interval', seconds=30, next_run_time=datetime.now())
 scheduler.start()
 # Запуск приложения. При запуске стартует клиент ТГ и при выключении происходит диссконнект клиента
 app = FastAPI(

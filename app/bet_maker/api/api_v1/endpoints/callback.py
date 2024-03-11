@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.bet_maker.schemas import api_schemas
 from app.core import deps
 from app.crud import crud_bet
+from app.models import Bet
 from app.schemas import crud_schemas
 
 router = APIRouter()
@@ -16,7 +17,7 @@ async def process_event(
         message_in: api_schemas.EventGet,
         db: AsyncSession = Depends(deps.get_db),
 ) -> Any:
-    bets_with_event = await crud_bet.get_by_event_id(db, event_id=message_in.id)
+    bets_with_event: list[Bet] = await crud_bet.get_by_event_id(db, event_id=message_in.id)
     for bet in bets_with_event:
         bet_status = 1
         if message_in.status_id == 2:
