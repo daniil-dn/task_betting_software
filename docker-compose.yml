@@ -2,6 +2,7 @@ version: '3.5'
 
 services:
   rabbitmq:
+    restart: on-failure
     image: rabbitmq:3-management
     container_name: rabbitmq_bet_maker
     hostname: 'rabbitmq'
@@ -19,6 +20,7 @@ services:
     dns:
       - 0.0.0.0
   db:
+    restart: on-failure
     container_name: postgresql_db_bet_maker
     image: postgres:13
     ports:
@@ -38,6 +40,7 @@ services:
     dns:
       - 0.0.0.0
   redis:
+    restart: on-failure
     container_name: rq_redis_bet
     image: bitnami/redis:6.2.1
     environment:
@@ -48,6 +51,7 @@ services:
     networks:
       - default
   app_bet_maker:
+    restart: on-failure
     build: .
     image: bet_maker
     ports:
@@ -83,6 +87,7 @@ services:
       - 0.0.0.0
 
   app_line_provider:
+    restart: on-failure
     build: .
     image: line_provider
     ports:
@@ -145,6 +150,7 @@ services:
       - REDIS_PORT=6379
       - REDIS_HOST=rq_redis_bet
   worker_bet_maker:
+    restart: on-failure
     build: .
     depends_on:
       - rabbitmq

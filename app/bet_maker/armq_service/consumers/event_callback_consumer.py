@@ -1,9 +1,15 @@
 import asyncio
+import json
 
 import aio_pika
 
+from app.bet_maker.schemas.armq_schemas import EventCallback
 from app.core.config import settings
+from app.crud import crud_bet
+from app.db import SessionLocal
 from app.logs import armq_bet_maker_log
+from app.models import Bet
+from app.schemas import crud_schemas
 
 
 class Consumer:
@@ -35,5 +41,26 @@ class Consumer:
             self,
             message: aio_pika.abc.AbstractIncomingMessage,
     ) -> None:
-        async with message.process(ignore_processed=True):
-            print(message)
+        async with message.process(requeue=True):
+            armq_bet_maker_log.info(message.body)
+            data_dict: dict = json.loads(message.body)
+            data = EventCallback(**data_dict)
+            async with SessionLocal() as db:
+                bets_with_event: list[Bet] = await crud_bet.get_by_event_id(
+                    db,
+                    event_id=data.id
+                )
+                for bet in bets_with_event:
+                    bet_status = 1
+                    if data.status_id == 2:
+                        bet_status = 2
+                    elif data.status_id == 3:
+                        bet_status = 3
+                    await crud_bet.update(
+                        db,
+                        db_obj=bet,
+                        obj_in=crud_schemas.BetUpdate(
+                            id=bet.id,
+                            status_id=bet_status
+                        )
+                    )

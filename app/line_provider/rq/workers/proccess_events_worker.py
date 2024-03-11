@@ -23,7 +23,7 @@ class WorkerProcessEventsSettings:
     )
     cron_jobs = [
         cron(
-            process_events, second={1, 30},
+            process_events, second=1,
             unique=True,
             job_id="process_events", run_at_startup=True
         )

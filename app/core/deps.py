@@ -8,8 +8,7 @@ from app.db import SessionLocal
 
 async def get_armq(timeout=None):
     connection = await aio_pika.connect_robust(settings.ARMQ_URL, timeout=timeout)
-    channel = await connection.channel()
-    return connection, channel
+    return connection
 
 
 async def get_db() -> Generator:
