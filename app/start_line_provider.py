@@ -1,8 +1,5 @@
 # fastapi
-import asyncio
-from datetime import datetime
 
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi import FastAPI
 
 from app.core.config import settings

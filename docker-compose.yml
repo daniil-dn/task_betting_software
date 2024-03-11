@@ -1,78 +1,9 @@
 version: '3.5'
 
 services:
-  app_bet_maker:
-    build: .
-    image: bet_maker
-    ports:
-      - "9090:9090"
-    volumes:
-      - .:/app
-    depends_on:
-      - rabbitmq
-    command: uvicorn app.start_bet_maker:app --host 0.0.0.0 --port 9090 --reload
-    networks:
-      - default
-    environment:
-      - DEBUG=True
-      - PROJECT_NAME=BOT_API
-      - RABBITMQ_HOST=localhost
-      - RABBITMQ_PORT=5672
-      - RABBITMQ_LOGIN=user
-      - RABBITMQ_PASSWORD=user
-      - SERVER_NAME=Bet_Maker_API
-      - SERVER_HOST=http://localhost
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=anihortes
-      - POSTGRES_SERVER=postgresql_db_bet_maker
-      - POSTGRES_DB=postgres
-      - LOGGER_ROTATION=10 MB
-      - LOGGER_COMPRESSION=zip
-      - LOGGER_DEBUG=True
-      - REDIS_PORT=6379
-      - REDIS_HOST=rq_redis_bet
-    tty: true
-    stdin_open: true
-    dns:
-      - 0.0.0.0
-
-  app_line_provider:
-    build: .
-    image: line_provider
-    ports:
-      - "9091:9090"
-    volumes:
-      - .:/app
-    depends_on:
-      - rabbitmq
-      - worker_line_provider
-    command: uvicorn app.start_line_provider:app --host 0.0.0.0 --port 9090 --reload
-
-    environment:
-      - DEBUG=True
-      - PROJECT_NAME=BOT_API
-      - RABBITMQ_HOST=localhost
-      - RABBITMQ_PORT=5672
-      - RABBITMQ_LOGIN=user
-      - RABBITMQ_PASSWORD=user
-      - SERVER_NAME=Line_Provider_API
-      - SERVER_HOST=http://localhost
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=anihortes
-      - POSTGRES_SERVER=postgresql_db_bet_maker
-      - POSTGRES_DB=postgres
-      - LOGGER_ROTATION=10 MB
-      - LOGGER_COMPRESSION=zip
-      - LOGGER_DEBUG=True
-      - REDIS_PORT=6379
-      - REDIS_HOST=rq_redis_bet
-    tty: true
-    stdin_open: true
-    dns:
-      - 0.0.0.0
   rabbitmq:
     image: rabbitmq:3-management
-    container_name: rabbitmq_bot_maker
+    container_name: rabbitmq_bet_maker
     hostname: 'rabbitmq'
     ports:
       - "5672:5672"
@@ -116,17 +47,57 @@ services:
       - "6379:6379"
     networks:
       - default
-  worker_line_provider:
+  app_bet_maker:
     build: .
+    image: bet_maker
+    ports:
+      - "9090:9090"
+    volumes:
+      - .:/app
     depends_on:
-      - redis
-    command: python3.10 app/run_line_provider_worker_async.py
+      - rabbitmq
+    command: uvicorn app.start_bet_maker:app --host 0.0.0.0 --port 9090 --reload
     networks:
       - default
     environment:
       - DEBUG=True
       - PROJECT_NAME=BOT_API
-      - RABBITMQ_HOST=localhost
+      - RABBITMQ_HOST=rabbitmq_bet_maker
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_LOGIN=user
+      - RABBITMQ_PASSWORD=user
+      - SERVER_NAME=Bet_Maker_API
+      - SERVER_HOST=http://localhost
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=anihortes
+      - POSTGRES_SERVER=postgresql_db_bet_maker
+      - POSTGRES_DB=postgres
+      - LOGGER_ROTATION=10 MB
+      - LOGGER_COMPRESSION=zip
+      - LOGGER_DEBUG=True
+      - REDIS_PORT=6379
+      - REDIS_HOST=rq_redis_bet
+    tty: true
+    stdin_open: true
+    dns:
+      - 0.0.0.0
+
+  app_line_provider:
+    build: .
+    image: line_provider
+    ports:
+      - "9091:9090"
+    volumes:
+      - .:/app
+    depends_on:
+      - rabbitmq
+      - worker_line_provider
+    command: uvicorn app.start_line_provider:app --host 0.0.0.0 --port 9090 --reload
+
+    environment:
+      - DEBUG=True
+      - PROJECT_NAME=BOT_API
+      - RABBITMQ_HOST=rabbitmq_bet_maker
       - RABBITMQ_PORT=5672
       - RABBITMQ_LOGIN=user
       - RABBITMQ_PASSWORD=user
@@ -141,5 +112,64 @@ services:
       - LOGGER_DEBUG=True
       - REDIS_PORT=6379
       - REDIS_HOST=rq_redis_bet
+    tty: true
+    stdin_open: true
+    dns:
+      - 0.0.0.0
+
+  worker_line_provider:
+    restart: on-failure
+    build: .
+    depends_on:
+      - redis
+      - db
+    command: python3.10 app/start_line_provider_worker_async.py
+    networks:
+      - default
+    environment:
+      - DEBUG=True
+      - PROJECT_NAME=BOT_API
+      - RABBITMQ_HOST=rabbitmq_bet_maker
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_LOGIN=user
+      - RABBITMQ_PASSWORD=user
+      - SERVER_NAME=Line_Provider_API
+      - SERVER_HOST=http://localhost
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=anihortes
+      - POSTGRES_SERVER=postgresql_db_bet_maker
+      - POSTGRES_DB=postgres
+      - LOGGER_ROTATION=10 MB
+      - LOGGER_COMPRESSION=zip
+      - LOGGER_DEBUG=True
+      - REDIS_PORT=6379
+      - REDIS_HOST=rq_redis_bet
+  worker_bet_maker:
+    build: .
+    depends_on:
+      - rabbitmq
+      - db
+    command: python3.10 app/start_bet_maker_amrq.py
+    networks:
+      - default
+    environment:
+      - DEBUG=True
+      - PROJECT_NAME=BOT_API
+      - RABBITMQ_HOST=rabbitmq_bet_maker
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_LOGIN=user
+      - RABBITMQ_PASSWORD=user
+      - SERVER_NAME=Line_Provider_API
+      - SERVER_HOST=http://localhost
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=anihortes
+      - POSTGRES_SERVER=postgresql_db_bet_maker
+      - POSTGRES_DB=postgres
+      - LOGGER_ROTATION=10 MB
+      - LOGGER_COMPRESSION=zip
+      - LOGGER_DEBUG=True
+      - REDIS_PORT=6379
+      - REDIS_HOST=rq_redis_bet
+
 volumes:
   postgres_data:

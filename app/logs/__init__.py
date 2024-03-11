@@ -18,5 +18,7 @@ scheduler_log = add_named_logger('scheduler')
 # RQ
 process_event_log = add_named_logger('scheduler')
 
+# ARMQ
+armq_bet_maker_log = add_named_logger('armq_bet_maker')
 # tests
 tests_log = add_named_logger('tests')
