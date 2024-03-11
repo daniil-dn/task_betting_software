@@ -13,11 +13,18 @@ class CRUDBet(
     CRUDBase[Bet,
     crud_schemas.BetCreate,
     crud_schemas.BetUpdate]
-    ):
+):
     async def get_all_not_processed(
             self, db: AsyncSession
     ) -> List[Bet]:
         q = select(Bet).filter(Bet.status_id == 1)
+        res = await db.execute(q)
+        return res.scalars().all()
+
+    async def get_by_event_id(
+            self, db: AsyncSession, *, event_id: int
+    ) -> List[Bet]:
+        q = select(Bet).filter(Bet.event_id == event_id)
         res = await db.execute(q)
         return res.scalars().all()
 

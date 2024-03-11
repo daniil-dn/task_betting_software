@@ -1,1 +1,1 @@
-from .event import EventCreateAPI
+from .event import EventCreateAPI, EventGet
