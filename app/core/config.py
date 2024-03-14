@@ -122,7 +122,7 @@ class Settings(BaseSettings):
         else:
             values["SQLALCHEMY_DATABASE_URI"] = None
 
-    class Config:
+    class ConfigDict:
         case_sensitive = True
 
 
