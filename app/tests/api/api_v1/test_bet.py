@@ -1,9 +1,12 @@
+import asyncio
 from datetime import datetime, timedelta
 
 import pytz
 import requests
 
+from app.bet_maker.api.api_v1.endpoints.bet import bets
 from app.core import settings
+from app.models import Bet, BetStatus
 
 
 class TestEvent:
@@ -36,6 +39,25 @@ class TestEvent:
             f"http://app_bet_maker:9090{settings.API_V1_STR}/bets"
         )
         assert r.status_code == 200
+
+    def test_get_bets_mock(self) -> None:
+        from mock import patch
+
+        with patch('app.crud.crud_bet.get_all') as perm_mock_bet:
+            perm_mock_bet.return_value = [
+                Bet(id=1, event_id=1, status_id=1, amount=1, updated_at=datetime.now(), created_at=datetime.now()),
+                Bet(id=1, event_id=1, status_id=1, amount=1, updated_at=datetime.now(), created_at=datetime.now()),
+                Bet(id=1, event_id=1, status_id=1, amount=1, updated_at=datetime.now(), created_at=datetime.now()),
+                Bet(id=1, event_id=1, status_id=1, amount=1, updated_at=datetime.now(), created_at=datetime.now())
+            ]
+            with patch('app.crud.crud_bet_status.get_all') as perm_mock_bet_statuses:
+                perm_mock_bet_statuses.return_value = [
+                    BetStatus(id=1, name='ещё не сыграла', created_at=datetime.now()),
+                    BetStatus(id=2, name='Выиграла', created_at=datetime.now()),
+                    BetStatus(id=3, name='Проиграла', created_at=datetime.now())]
+                test_bets = asyncio.run(bets())
+                print(test_bets)
+                assert len(test_bets) == 4
 
     def test_get_events(self) -> None:
         r = requests.get(

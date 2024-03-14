@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from pydantic import AnyHttpUrl, PostgresDsn, model_validator, field_validator
 from pydantic_settings import BaseSettings
 
-load_dotenv('.env_uvicorn')
+load_dotenv('.env')
 BASE_DIR = Path(__file__).resolve().parent
 
 
